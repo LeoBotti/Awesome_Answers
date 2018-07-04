@@ -1,0 +1,37 @@
+<%#
+  `form_for` is a helper method that generates forms based
+  on instances of models. From that model instance, the form
+  will infer the following:
+
+  - The name of the model (e.g record.class.to_s)
+  - The path to submit the form data to.
+  - Whether or not the form is used to create a new instance
+    or edit an existing one
+  - It will also prepopulatin field values based on
+    the attributes present on the instance
+%>
+
+<%= form_for(@question) do |f| %>
+  <% if @question.errors.present? %>
+    <p>
+      <%= @question.errors.full_messages.join(', ') %>
+    </p>
+  <% end %>
+
+  <div>
+    <%= f.label(:title) %>
+    <%= f.text_field(:title) %>
+  </div>
+
+  <div>
+    <%= f.label(:body) %>
+    <%= f.text_area(:body) %>
+  </div>
+
+  <%= f.submit %>
+<% end %>
+
+<%#
+  For more on form helpers, go to:
+  http://guides.rubyonrails.org/form_helpers.html
+%>

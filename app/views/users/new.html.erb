@@ -1,0 +1,104 @@
+<h2><%= @question.title %></h2>
+
+<p><%= @question.body %></p>
+
+<p>By <%= @question.user&.full_name || "[Deleted]" %></p>
+
+<div>
+  <small>
+    Posted <%= time_ago_in_words(@question.created_at) %> ago
+  </small>
+  â¢
+  <small>
+    Last edited <%= time_ago_in_words(@question.updated_at) %> ago
+  </small>
+  â¢
+  <small>
+    Seen <%= @question.view_count %> time(s)
+  </small>
+</div>
+
+<% if user_signed_in? %>
+<div>
+  <% if can?(:edit, @question) %>
+    <small>
+      <%= link_to "Edit", edit_question_path(@question) %>
+    </small>
+  <% end %>
+
+  <% if can?(:delete, @question) %>
+    <small>
+      <%= link_to(
+        "Delete",
+        question_path(@question),
+        method: :delete,
+        data: {
+          confirm: "Are you sure?"
+        }
+      ) %>
+    </small>
+  <% end %>
+</div>
+<% end %>
+
+<h2>Answers</h2>
+
+<%#
+  The tell a form_for that we're creating an answer
+  that belongs to a question, we must use an array as
+  the first argument where its first element is the
+  parent question and its second element is the
+  new answer.
+
+  When doing this, `form_for` will use different
+  to get the `action` attribute. In this case, it would
+  use `questions_answers_path`.
+%>
+
+<%= form_for [@question, @answer] do |f| %>
+  <% if @answer.errors.present? %>
+    <p>
+      <%= @answer.errors.full_messages.join(', ') %>
+    </p>
+  <% end %>
+
+  <%#= f.hidden_field :question_id, value: @question.id %>
+  <div>
+    <%= f.text_area(
+      :body, cols: 60, rows: 6,
+      placeholder: "What are your thoughts?"
+    ) %>
+  </div>
+
+  <%= f.submit "Submit" %>
+<% end %>
+
+<div class="answer-list">
+  <% @answers.each do |answer| %>
+    <div>
+      <p>
+        <strong>
+          <%= answer.user&.full_name || "[DELETED]" %> answered:
+        </strong> <br />
+        <%= answer.body %> <br />
+
+        <% if user_signed_in? && can?(:delete, answer) %>
+        <small>
+          <%= link_to(
+            "Delete",
+            question_answer_path(@question, answer),
+            method: :delete,
+            data: {
+              confirm: "Are you sure?"
+            }
+          ) %>
+        </small>
+        â¢
+        <% end %>
+        <small>
+          Answered <%= time_ago_in_words(answer.created_at) %> ago
+        </small>
+      </p>
+    </div>
+  <% end %>
+</div>
